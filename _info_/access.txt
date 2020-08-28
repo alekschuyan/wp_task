@@ -1,0 +1,3 @@
+admin panel: /wp-admin
+login: administrator
+pass: MteqDaCF2X9xLjwv
