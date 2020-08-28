@@ -61,18 +61,6 @@ class Linkoption_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Linkoption_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Linkoption_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/linkoption-admin.css', array(), $this->version, 'all' );
 
 	}
@@ -84,20 +72,29 @@ class Linkoption_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Linkoption_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Linkoption_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/linkoption-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
+
+    public function add_plugin_admin_menu() {
+
+        add_options_page( 'Plugin options', 'Linkoption', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page')
+        );
+    }
+
+    public function add_action_links( $links ) {
+        
+       $settings_link = array(
+        '<a href="' . admin_url( 'options-general.php?page=' . $this->plugin_name ) . '">' . __('Settings', $this->plugin_name) . '</a>',
+       );
+       return array_merge(  $settings_link, $links );
+
+    }
+
+    public function display_plugin_setup_page() {
+        
+        include_once( 'partials/linkoption-admin-display.php' );
+        
+    } 
 
 }
