@@ -64,7 +64,18 @@ define( 'WP_CACHE_KEY_SALT', 'O.,~5u>7i w*!iK26]q!pPvBp#FrT?/ak7S?s?x(|M-%g RAce
  */
 $table_prefix = 'wp_';
 
+define('FS_METHOD','direct');
 
+if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
+    $_SERVER['HTTP_HOST'] = 'localhost';
+}
+
+ini_set('display_errors','Off');
+define('WP_DEBUG', true);
+define('WP_DEBUG_DISPLAY', false);
+define('WP_DEBUG_LOG', true);
+define('WP_HOME', 'http://' . $_SERVER['HTTP_HOST']);
+define('WP_SITEURL', 'http://' . $_SERVER['HTTP_HOST']);
 
 
 /* That's all, stop editing! Happy publishing. */
