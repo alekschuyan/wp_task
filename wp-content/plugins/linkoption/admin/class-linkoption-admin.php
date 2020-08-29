@@ -51,6 +51,7 @@ class Linkoption_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->my_plugin_options = get_option($this->plugin_name);
 
 	}
 
@@ -95,6 +96,17 @@ class Linkoption_Admin {
         
         include_once( 'partials/linkoption-admin-display.php' );
         
-    } 
+    }
+
+   	public function validate($input) {
+     	$valid = array();
+     	return $valid;
+   	}
+
+   	public function options_update() {
+        // register_setting($this->plugin_name, $this->plugin_name, array($this, 'validate'));
+        // var_dump($_REQUEST); exit;
+        register_setting($this->plugin_name, $this->plugin_name, array());
+    }
 
 }
