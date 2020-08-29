@@ -104,9 +104,20 @@ class Linkoption_Admin {
    	}
 
    	public function options_update() {
-        // register_setting($this->plugin_name, $this->plugin_name, array($this, 'validate'));
-        // var_dump($_REQUEST); exit;
         register_setting($this->plugin_name, $this->plugin_name, array());
+    }
+
+   	public function post_types_list() {
+
+   		$args = array(
+   			'public' => 1
+   		);
+        $post_types = get_post_types($args);
+
+        if(isset($post_types['attachment']))
+        	unset($post_types['attachment']);
+
+        return $post_types;
     }
 
 }

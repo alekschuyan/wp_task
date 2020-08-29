@@ -85,54 +85,66 @@ class Linkoption_Public {
 
   	public function filter_link_options($content){
 
-  		// check options rel_nofollow_attr & target_blank_attr
-  		$rel_nofollow_attr = $this->my_plugin_options['rel_nofollow_attr'];
-  		$target_blank_attr = $this->my_plugin_options['target_blank_attr'];
+  		$post_type = get_post_type();
+  		// var_dump($post_type); exit;
 
-  		if((isset($rel_nofollow_attr) && $rel_nofollow_attr) || (isset($target_blank_attr) && $target_blank_attr)) {
+  		if(isset($post_type) && isset($this->my_plugin_options[$post_type])) {
 
-			$dom = new DOMDocument();
-			libxml_use_internal_errors(true);
+  			// check post type
+	  		$post_type_options_enabled = $this->my_plugin_options[$post_type];
 
-			$dom->preserveWhitespace = FALSE;
+	  		if(isset($post_type_options_enabled) && $post_type_options_enabled) {
 
-			$dom->loadHTML($content);
+		  		// check options rel_nofollow_attr & target_blank_attr
+		  		$rel_nofollow_attr = $this->my_plugin_options['rel_nofollow_attr'];
+		  		$target_blank_attr = $this->my_plugin_options['target_blank_attr'];
 
-			// get all links
-			$a = $dom->getElementsByTagName('a');
+		  		if((isset($rel_nofollow_attr) && $rel_nofollow_attr) || (isset($target_blank_attr) && $target_blank_attr)) {
 
-			$host = strtok($_SERVER['HTTP_HOST'], ':');
+					$dom = new DOMDocument();
+					libxml_use_internal_errors(true);
 
-			foreach($a as $anchor) {
+					$dom->preserveWhitespace = FALSE;
 
-		        $href = $anchor->attributes->getNamedItem('href')->nodeValue;
+					$dom->loadHTML($content);
 
-		        // check internal/external domain
-		        $internal = preg_match('/^https?:\/\/' . preg_quote($host, '/') . '/', $href);
+					// get all links
+					$a = $dom->getElementsByTagName('a');
 
-				$href_parts = explode('/', $href);
-				if(isset($href_parts[0]) && $href_parts[0] == '') { $internal2 = true; }
-				else $internal2 = false;
+					$host = strtok($_SERVER['HTTP_HOST'], ':');
 
-				$href_parts = explode('?', $href);
-				if(isset($href_parts[0]) && $href_parts[0] == '') { $internal3 = true; }
-				else $internal3 = false;
+					foreach($a as $anchor) {
 
-		        if ($internal || $internal2 || $internal3) {
-		           	continue;
-		        }
+				        $href = $anchor->attributes->getNamedItem('href')->nodeValue;
 
-		        if(isset($rel_nofollow_attr) && $rel_nofollow_attr) {
-		        	$this->set_link_option($dom, $anchor, 'rel', 'nofollow');
-			    }
+				        // check internal/external domain
+				        $internal = preg_match('/^https?:\/\/' . preg_quote($host, '/') . '/', $href);
 
-		        if(isset($target_blank_attr) && $target_blank_attr) {
-		        	$this->set_link_option($dom, $anchor, 'target', '_blank');
-			    }
+						$href_parts = explode('/', $href);
+						if(isset($href_parts[0]) && $href_parts[0] == '') { $internal2 = true; }
+						else $internal2 = false;
 
+						$href_parts = explode('?', $href);
+						if(isset($href_parts[0]) && $href_parts[0] == '') { $internal3 = true; }
+						else $internal3 = false;
+
+				        if ($internal || $internal2 || $internal3) {
+				           	continue;
+				        }
+
+				        if(isset($rel_nofollow_attr) && $rel_nofollow_attr) {
+				        	$this->set_link_option($dom, $anchor, 'rel', 'nofollow');
+					    }
+
+				        if(isset($target_blank_attr) && $target_blank_attr) {
+				        	$this->set_link_option($dom, $anchor, 'target', '_blank');
+					    }
+
+					}
+
+					$content = $dom->saveHTML();
+				}
 			}
-
-			$content = $dom->saveHTML();
 		}
 
 		return $content;

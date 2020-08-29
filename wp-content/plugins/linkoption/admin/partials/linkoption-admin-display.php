@@ -28,8 +28,8 @@
     
     ?>
 
-	<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-    <h4><?php _e('Links options', $this->plugin_name); ?>:</h4>
+	<h1><?php echo esc_html( get_admin_page_title() ); ?></h2>
+    <h3><?php _e('Links options', $this->plugin_name); ?>:</h4>
 
     <fieldset>
         <legend class="screen-reader-text"><span><?php _e('Enable nofollow attribute for external links (rel="nofollow")', $this->plugin_name);?></span></legend>
@@ -47,6 +47,27 @@
         </label>
     </fieldset>
 
+    <?php
+    
+    $post_types = $this->post_types_list();
+    
+    if(isset($post_types) && !empty($post_types)) { ?>
+
+        <h3><?php _e('Post types - apply links options to selected post types:', $this->plugin_name); ?>:</h4>
+
+        <?php foreach( $post_types as $post_type ) { ?>
+
+            <fieldset>
+                <legend class="screen-reader-text"><span><?php _e($post_type, $this->plugin_name);?></span></legend>
+                <label for="<?php echo $this->plugin_name;?>-<?=$post_type;?>">
+                    <input name="<?php echo $this->plugin_name;?>[<?=$post_type;?>]" type="checkbox" id="<?php echo $this->plugin_name;?>-<?=$post_type;?>" value="1" <?php if(isset($options[$post_type])) { checked( $options[$post_type], '1', TRUE ); } ?> />
+                    <span><?php _e($post_type, $this->plugin_name);?></span>
+                </label>
+            </fieldset>
+
+        <?php } ?>
+        
+    <?php } ?>
 
     <?php submit_button(__('Save plugin settings', $this->plugin_name), 'primary','submit', TRUE); ?>
 
