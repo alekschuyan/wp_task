@@ -62,18 +62,6 @@ class Linkoption_Public {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Linkoption_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Linkoption_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/linkoption-public.css', array(), $this->version, 'all' );
 
 	}
@@ -85,26 +73,23 @@ class Linkoption_Public {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Linkoption_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Linkoption_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/linkoption-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
+	/**
+	 * Checks and applies settings for link attributes.
+	 *
+	 * @since    1.0.0
+	 */
+
   	public function filter_link_options($content){
 
   		// check options rel_nofollow_attr & target_blank_attr
-  		if((isset($this->my_plugin_options['rel_nofollow_attr']) && $this->my_plugin_options['rel_nofollow_attr']) || (isset($this->my_plugin_options['target_blank_attr']) && $this->my_plugin_options['target_blank_attr'])) {
+  		$rel_nofollow_attr = $this->my_plugin_options['rel_nofollow_attr'];
+  		$target_blank_attr = $this->my_plugin_options['target_blank_attr'];
+
+  		if((isset($rel_nofollow_attr) && $rel_nofollow_attr) || (isset($target_blank_attr) && $target_blank_attr)) {
 
 			$dom = new DOMDocument();
 			libxml_use_internal_errors(true);
@@ -137,50 +122,12 @@ class Linkoption_Public {
 		           	continue;
 		        }
 
-		        if(isset($this->my_plugin_options['rel_nofollow_attr']) && $this->my_plugin_options['rel_nofollow_attr']) {
-
-			        $nofollow_rel = 'nofollow';
-			        $old_nofollow_attr = $anchor->attributes->getNamedItem('rel');
-
-			        if ($old_nofollow_attr == NULL) {
-			            $new_nofollow = $nofollow_rel;
-			        } else {
-			            $old_nofollow = $old_nofollow_attr->nodeValue;
-			            $old_nofollow = explode(' ', $old_nofollow);
-			            if (in_array($nofollow_rel, $old_nofollow)) {
-			                continue;
-			            }
-			            $old_nofollow[] = $nofollow_rel;
-			            $new_nofollow = implode(' ', $old_nofollow);
-			        }
-
-			        $new_nofollow_attr = $dom->createAttribute('rel');
-			        $nofollow_node = $dom->createTextNode($new_nofollow);
-			        $new_nofollow_attr->appendChild($nofollow_node);
-			        $anchor->appendChild($new_nofollow_attr);
+		        if(isset($rel_nofollow_attr) && $rel_nofollow_attr) {
+		        	$this->set_link_option($dom, $anchor, 'rel', 'nofollow');
 			    }
 
-		        if(isset($this->my_plugin_options['target_blank_attr']) && $this->my_plugin_options['target_blank_attr']) {
-
-			        $target_blank = '_blank';
-			        $old_target_attr = $anchor->attributes->getNamedItem('target');
-
-			        if ($old_target_attr == NULL) {
-			            $new_target = $target_blank;
-			        } else {
-			            $old_target = $old_target_attr->nodeValue;
-			            $old_target = explode(' ', $old_target);
-			            if (in_array($target_blank, $old_target)) {
-			                continue;
-			            }
-			            $old_target[] = $target_blank;
-			            $new_target = implode(' ', $old_target);
-			        }
-
-			        $new_target_attr = $dom->createAttribute('target');
-			        $target_blank_node = $dom->createTextNode($new_target);
-			        $new_target_attr->appendChild($target_blank_node);
-			        $anchor->appendChild($new_target_attr);
+		        if(isset($target_blank_attr) && $target_blank_attr) {
+		        	$this->set_link_option($dom, $anchor, 'target', '_blank');
 			    }
 
 			}
@@ -189,6 +136,37 @@ class Linkoption_Public {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Checks and sets specific values of link attributes
+	 *
+	 * @since    1.0.0
+	 */
+
+	private function set_link_option($dom = NULL, $anchor = NULL, $attr = '', $attr_value = ''){
+
+		if(!isset($dom) || $dom == NULL || !isset($anchor) || $anchor == NULL)
+			return;
+
+        $old_attr = $anchor->attributes->getNamedItem($attr);
+
+        if ($old_attr == NULL) {
+            $new_attr = $attr_value;
+        } else {
+            $old_attr_value = $old_attr->nodeValue;
+            $old_attr_value = explode(' ', $old_attr_value);
+            if (in_array($attr_value, $old_attr_value)) {
+                return;
+            }
+            $old_attr_value[] = $attr_value;
+            $new_attr = implode(' ', $old_attr_value);
+        }
+
+        $new_attr_el = $dom->createAttribute($attr);
+        $attr_node = $dom->createTextNode($new_attr);
+        $new_attr_el->appendChild($attr_node);
+        $anchor->appendChild($new_attr_el);
 	}
 
 }
