@@ -53,7 +53,7 @@
     
     if(isset($post_types) && !empty($post_types)) { ?>
 
-        <h3><?php _e('Post types - apply links options to selected post types:', $this->plugin_name); ?>:</h4>
+        <h3><?php _e('Post types - apply links options to selected post types', $this->plugin_name); ?>:</h4>
 
         <?php foreach( $post_types as $post_type ) { ?>
 
